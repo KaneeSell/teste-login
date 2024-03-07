@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tela de Login</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-image: url('background.jpg');
+    background-size: cover;
+  }
+
+  .login-container, .cadastro-container, #menu-container {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  .login-container img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+  }
+
+  .login-container input[type="text"],
+  .login-container input[type="password"],
+  .cadastro-container input[type="text"],
+  .cadastro-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+  }
+
+  .login-container button,
+  .cadastro-container button, #menu-container button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  .login-container button:hover,
+  .cadastro-container button:hover, #menu-container button:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+    <!-- Conteúdo do Login aqui -->
+<div class="login-container">
+    <h2>Login</h2>
+  <img src="placeholder.jpg" alt="Foto do Usuário">
+  <form id="login-form">
+    <input type="text" id="username" placeholder="Usuário" required>
+    <br>
+    <input type="password" id="password" placeholder="Senha" required>
+    <br>
+    <button type="submit">Login</button>
+  </form>
+  <button id="cadastro-btn">Cadastrar</button>
+</div>
+
+  <!-- Conteúdo do Cadastro aqui -->
+<div class="cadastro-container" style="display: none;">
+  <h2>Cadastro</h2>
+  <form id="cadastro-form">
+    <input type="text" id="new-username" placeholder="Novo Usuário" required>
+    <br>
+    <input type="password" id="new-password" placeholder="Nova Senha" required>
+    <br>
+    <button type="submit">Cadastrar</button>
+    <button id="voltar-login">Voltar para o Login</button>
+  </form>
+</div>
+
+  <!-- Conteúdo do menu aqui -->
+<div id="menu-container" style="display: none;">
+    <h2>Menu</h2>
+  <button id="voltar-login-menu">Voltar para o Login</button>
+</div>
+
+<script>
+  var loginContainer = document.querySelector('.login-container');
+  var cadastroContainer = document.querySelector('.cadastro-container');
+  var menuContainer = document.getElementById('menu-container');
+  var usernameInput = document.getElementById('username');
+  var passwordInput = document.getElementById('password');
+
+  document.getElementById('cadastro-btn').addEventListener('click', function() {
+    loginContainer.style.display = 'none';
+    cadastroContainer.style.display = 'block';
+  });
+
+  document.getElementById('login-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var username = usernameInput.value;
+    var password = passwordInput.value;
+
+    var storedUsers = parseCookie('users');
+
+    // Mudar de !== para ===, volta a funcionar o login
+    var user = storedUsers.find(function(user) {
+      return user.username === username && user.password === password;
+    });
+
+    if (user) {
+      alert('Login feito com sucesso!');
+      loginContainer.style.display = 'none';
+      menuContainer.style.display = 'block';
+    } else {
+      alert('Usuário ou senha inválidos');
+      usernameInput.value = ''; // Limpa o campo de usuário
+      passwordInput.value = ''; // Limpa o campo de senha
+    }
+  });
+
+  document.getElementById('cadastro-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var newUsername = document.getElementById('new-username').value;
+    var newPassword = document.getElementById('new-password').value;
+
+    var storedUsers = parseCookie('users') || [];
+    var newUser = { username: newUsername, password: newPassword };
+    storedUsers.push(newUser);
+    createCookie('users', JSON.stringify(storedUsers));
+
+    alert('Usuário cadastrado com sucesso!');
+    cadastroContainer.style.display = 'none';
+    loginContainer.style.display = 'block';
+  });
+
+  document.getElementById('voltar-login').addEventListener('click', function() {
+    cadastroContainer.style.display = 'none';
+    loginContainer.style.display = 'block';
+  });
+
+  document.getElementById('voltar-login-menu').addEventListener('click', function() {
+    menuContainer.style.display = 'none';
+    loginContainer.style.display = 'block';
+  });
+
+  function createCookie(name, value, days) {
+    var expires = '';
+    if (days) {
+      var date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      expires = '; expires=' + date.toUTCString();
+    }
+    document.cookie = name + '=' + value + expires + '; path=/';
+  }
+
+  function parseCookie(name) {
+    var cookies = document.cookie.split(';');
+    for (var i = 0; i < cookies.length; i++) {
+      var cookie = cookies[i];
+      while (cookie.charAt(0) == ' ') {
+        cookie = cookie.substring(1, cookie.length);
+      }
+      if (cookie.indexOf(name + '=') == 0) {
+        return JSON.parse(cookie.substring(name.length + 1, cookie.length));
+      }
+    }
+    return null;
+  }
+</script>
+</body>
+</html>
